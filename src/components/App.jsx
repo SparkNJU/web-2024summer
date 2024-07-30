@@ -1,71 +1,71 @@
-import { useEffect, useState } from "react"
-import NewTodo from "./NewTodoForm";
+// App.jsx
+import React, { useEffect, useState } from 'react';
+import NewTodo from './NewTodoForm';
+import '../styles/input.css';
 
 export default function App() {
-
   const [todos, setToDos] = useState(() => {
-    const localValue = localStorage.getItem("ITEM")
+    const localValue = localStorage.getItem('ITEM');
 
     if (!localValue) return [];
-    return JSON.parse(localValue)
+    return JSON.parse(localValue);
   });
 
-  useEffect (() => {
-    localStorage.setItem("ITEM" , JSON.stringify(todos))
-  } , [todos]);
+  useEffect(() => {
+    localStorage.setItem('ITEM', JSON.stringify(todos));
+  }, [todos]);
 
-  const addTodos = (title) =>{
-    setToDos((prevTodos) => { // 使用 prevTodos 来表示当前的 todos 状态  
-      return [...prevTodos, { id: crypto.randomUUID(), title, completed: false }]; // 使用 prevTodos 来添加新项  
-    }); 
-
-  }
+  const addTodos = (title) => {
+    setToDos((prevTodos) => [
+      ...prevTodos,
+      { id: crypto.randomUUID(), title, completed: false },
+    ]);
+  };
 
   const toggleTodo = (id, completed) => {
-    setToDos((prevTodos) => {
-      return prevTodos.map((todo) => {
-        if (todo.id === id) {
-          return { ...todo, completed: completed };
-        } else {
-          return todo;
-        }
-      }
-      )}
-    )}
+    setToDos((prevTodos) =>
+      prevTodos.map((todo) =>
+        todo.id === id ? { ...todo, completed } : todo
+      )
+    );
+  };
 
   const deleteTodo = (id) => {
-    setToDos((prevTodos) => {
-      return prevTodos.filter((todo) => {
-        return todo.id !== id;
-      })
-    }
-  )}
+    setToDos((prevTodos) => prevTodos.filter((todo) => todo.id !== id));
+  };
 
   return (
-    <>
-    <NewTodo addTodos = {addTodos}/>
-      
+    <div className="bg-gray-100 min-h-screen">
+      <NewTodo addTodos={addTodos} />
 
-      <div align="center">
-        <h1 className="header">ToDoList</h1>
-      </div>
+      <div className="container mx-auto px-4">
+        <h1 className="text-4xl font-black text-center my-8">待办事项列表</h1>
 
-      <ul className="list">
-
-        {todos.map((todo) => {
-          return (
-            <li key={todo.id}>
-              <label>
-                <input type="checkbox" checked={todo.completed} onChange={(e) => toggleTodo(todo.id, e.target.checked)}></input>
-                {todo.title}
+        <ul className="space-y-4">
+          {todos.map((todo) => (
+            <li
+              key={todo.id}
+              className="bg-white rounded-lg shadow-md p-4 flex items-center justify-between"
+            >
+              <label className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  checked={todo.completed}
+                  onChange={(e) => toggleTodo(todo.id, e.target.checked)}
+                  className="form-checkbox h-6 w-6 text-blue-500"
+                />
+                <span className="text-lg">{todo.title}</span>
               </label>
-              <button className="btn btn-danger" type="button" style={{ color: "red" }} onClick={(e) => deleteTodo(todo.id)}>Delete</button>
+              <button
+                className="text-red-500 hover:text-red-600"
+                onClick={() => deleteTodo(todo.id)}
+              >
+                删除
+              </button>
             </li>
-
-          )
-        })}
-
-      </ul>
-    </>
-  )
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
 }
